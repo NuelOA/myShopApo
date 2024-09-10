@@ -2,6 +2,23 @@
   text-align: center;
 }
 
+/* styles.css */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

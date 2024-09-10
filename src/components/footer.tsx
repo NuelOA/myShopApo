@@ -1,0 +1,48 @@
+import { Button, Indicator, Text } from '@mantine/core'
+import { IconShoppingBag, IconShoppingCart } from '@tabler/icons-react'
+import React, { useState } from 'react'
+import { useCart } from '../context/cartContext'
+import { formatCurrency } from '../utils/currencyFormatter'
+import { ModalCartItem } from './cartItemModal'
+import { useDisclosure } from '@mantine/hooks';
+
+
+interface currencyType {
+    currency: string
+}
+export default function Footer( currency: currencyType ) {
+  const {total, cart } = useCart()
+  const [opened, { open, close }] = useDisclosure(false)
+  const [paynow, setPayNow] = useState(false)
+
+  console.log(paynow)
+  return (
+   <div style={{ display: 'flex', justifyContent: 'center'}}>
+          <ModalCartItem opened={opened} onClose={close} pay={paynow ? true : false}/>
+     <div style={footerstyle}>
+        <div onClick={()=> {
+          setPayNow(false)
+          open()
+        }} style={{ display:'flex', cursor: 'pointer', justifyContent: 'center', alignItems:'center', width: '50%', height: 50}}><Indicator size={15} color='red' inline label={cart.length}> <IconShoppingCart /></Indicator>
+        <Text mr={20}>{formatCurrency(total, currency.currency)}</Text>
+        </div>
+        <Button onClick={()=> {
+          setPayNow(true)
+          open()
+        }} style={{ borderRadius: 'none', backgroundColor: 'green', height: 50, alignItems:'center', display: 'flex', width: '50%', justifyContent: 'center', fontWeight: 'bold'}}> Pay Now</Button>
+        </div>
+   </div>
+  )
+}
+
+const footerstyle: React.CSSProperties = {
+    backgroundColor: '#000',
+    position: 'fixed',
+     bottom: 0, 
+     width: '80%',
+    alignItems:'center', 
+     color: '#fff',
+     display: 'flex', 
+     flexDirection:'row',
+     justifyContent: 'space-between'
+}
