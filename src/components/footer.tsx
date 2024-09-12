@@ -15,7 +15,6 @@ export default function Footer( currency: currencyType ) {
   const [opened, { open, close }] = useDisclosure(false)
   const [paynow, setPayNow] = useState(false)
 
-  console.log(paynow)
   return (
    <div style={{ display: 'flex', justifyContent: 'center'}}>
           <ModalCartItem opened={opened} onClose={close} pay={paynow ? true : false}/>
@@ -23,13 +22,13 @@ export default function Footer( currency: currencyType ) {
         <div onClick={()=> {
           setPayNow(false)
           open()
-        }} style={{ display:'flex', cursor: 'pointer', justifyContent: 'center', alignItems:'center', width: '50%', height: 50}}><Indicator size={15} color='red' inline label={cart.length}> <IconShoppingCart /></Indicator>
+        }} style={{ display:'flex', cursor: 'pointer', justifyContent: 'center', alignItems:'center', width: '50%', height: 50}}><Indicator style={{ marginInline: 15}}  size={15} color='red' inline label={cart.length}> <IconShoppingCart /></Indicator>
         <Text mr={20}>{formatCurrency(total, currency.currency)}</Text>
         </div>
-        <Button onClick={()=> {
+        <Button color={'#008000'} disabled={cart.length <= 0 ? true : false} onClick={()=> {
           setPayNow(true)
           open()
-        }} style={{ borderRadius: 'none', backgroundColor: 'green', height: 50, alignItems:'center', display: 'flex', width: '50%', justifyContent: 'center', fontWeight: 'bold'}}> Pay Now</Button>
+        }} style={{ borderRadius: 'none', height: 50, alignItems:'center', display: 'flex', width: '50%', justifyContent: 'center', fontWeight: 'bold'}}> Pay Now</Button>
         </div>
    </div>
   )

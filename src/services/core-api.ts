@@ -15,13 +15,15 @@ const getDrinks = (): cartData[] => {
 
 
 const makePayment = async() => {    
+    // http://localhost:8080/smart/SmartPayAPI
     try {
-     const response =  await fetch ('http://localhost:8080/smartpay/SmartPayAPI/transaction', {
+     const response =  await fetch ('http://localhost:8080/smart/SmartPayAPI/transaction', {
         method: 'POST',
         // mode: 'no-cors',
-        headers: {
-            'Content-Type': 'application/json',
-          },
+        // headers: {
+        //     'Content-Type': 'application/json',
+            
+        //   },
           body: JSON.stringify({
             "MessageType":"0200",
             "TransactionType":"00",
@@ -42,7 +44,7 @@ const makePayment = async() => {
           })
      })
      const data = await response.json()
-     console.log(data)
+     console.log(data, 'here')
      return data
     } catch (err) {
         if (err instanceof Error) {

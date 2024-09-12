@@ -52,8 +52,7 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
   const payNow = async () => {
     try {
       const response = await makePayment();
-      console.log(response);
-      alert(response)
+      console.log(response)
     } catch (err) {
       alert(err)
       console.log(err);
@@ -260,7 +259,7 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
           }
 
           <div style={{ marginBottom: 20 }}>
-            <Alert color="green" mt={20}>
+            {/* <Alert color="green" mt={20}>
               <div
                 style={{
                   display: "flex",
@@ -271,7 +270,7 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
                 <Text fw={"bold"}>Total</Text>
                 <Text>{formatCurrency(total, currency)}</Text>
               </div>
-            </Alert>
+            </Alert> */}
 
             <div
               style={{
