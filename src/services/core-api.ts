@@ -1,6 +1,7 @@
 
 import { cartData, data } from "../data/drinks";
 import { drinksType } from "../types/drinksType";
+import axios from 'axios';
 
 const getDrinks = (): cartData[] => {
     try {
@@ -10,21 +11,18 @@ const getDrinks = (): cartData[] => {
             throw new Error(err.message);
         }
     }
-    return []; // Fallback in case of an error, though this would rarely be reached in this context
+    return [];
 };
 
 
-const makePayment = async() => {    
-    // http://localhost:8080/smart/SmartPayAPI
-    try {
-     const response =  await fetch ('http://localhost:8080/smart/SmartPayAPI/transaction', {
-        method: 'POST',
-        // mode: 'no-cors',
-        // headers: {
-        //     'Content-Type': 'application/json',
-            
-        //   },
-          body: JSON.stringify({
+ const makePayment = async (amount: string) => {
+  try {
+    const response = await fetch('http://172.60.254.87:8080/v1/pay', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
             "MessageType":"0200",
             "TransactionType":"00",
             "TellerID": "Teller001",
@@ -33,25 +31,34 @@ const makePayment = async() => {
             "DateTime":"20230908221310",
             "InvoiceNo":"001134440",
             "TenderType":"00",
-            "Currency":"748",
-            "CurrencySymbol":"E",
-            "TransactionAmount":"120.00",
+            "Currency":"936",
+            "CurrencySymbol":"GHS",
+            "TransactionAmount": amount,
             "CashBackAmount":"0.00",
             "Narration":"Purchase Transaction",
             "Account1":"",
             "Account2":"",
             "EchoData":"Testing 123"
-          })
-     })
-     const data = await response.json()
-     console.log(data, 'here')
-     return data
-    } catch (err) {
-        if (err instanceof Error) {
-            throw new Error(err.message);
-        }
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
-}
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error making pay request:', error);
+    throw error;
+  }
+};
+
+
+  
+
+
+
 
 export {
     getDrinks,

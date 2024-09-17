@@ -1,5 +1,5 @@
 import { useDisclosure } from "@mantine/hooks";
-import { Alert, Button, Modal, Text, Title, Table, Divider } from "@mantine/core";
+import { Alert, Button, Modal, Text, Title, Table, Divider, Loader } from "@mantine/core";
 import { CartItem } from "../types/cartType";
 import { useCart } from "../context/cartContext";
 import {
@@ -18,6 +18,7 @@ type ModalCartItemProps = {
   opened: boolean;
   onClose: () => void;
   pay: boolean;
+  showCart: boolean
 };
 
 const paymentMethods = [
@@ -26,11 +27,15 @@ const paymentMethods = [
   { title: "QR" },
 ];
 
-export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
+export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemProps) {
   // Destructure props
   const { cart, removeFromCart, clearCart, total } = useCart();
   const { currency } = useCurrency();
   const [payScreen, setPayScreen] = useState(pay);
+  const [cartScreen, setCartScreen] = useState(showCart);
+  const [loading, setLoading] = useState(false)
+ 
+  console.log(cartScreen)
 
   const rows = cart.map((item) => (
     <Table.Tr key={item.id}>
@@ -50,11 +55,16 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
   ));
 
   const payNow = async () => {
+    setLoading(true)
     try {
-      const response = await makePayment();
-      console.log(response)
+      const data = await makePayment(total.toFixed(2));
+      if(data.ResponseText === 'Approved'){
+        setLoading(false)
+        alert('payment successful')
+      }
     } catch (err) {
       alert(err)
+      setLoading(false)
       console.log(err);
     }
   };
@@ -65,9 +75,10 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
         size={"60%"}
         opened={opened}
         onClose={onClose}
-        title={<Title order={3}>Item Details</Title>}
+        // title={<Title order={3}>Item Details</Title>}
         centered
       >
+        
         <div
           style={{
             paddingInline: "3%",
@@ -88,11 +99,22 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
                   alignItems: "center",
                 }}
               >
-                <Text style={{ fontSize: 13 }}> Payment Amount </Text>
-                <Title mt={15} mb={10} order={1}>
+           
+                {loading ? <>
+                  <Text style={{ fontSize: 13 }}> Amount {formatCurrency(total, currency)} </Text>
+                  <Loader mt={20} color="#000" />
+                  <Text mt={20} style={{ fontSize: 13 }}> Processing Transaction </Text>
+                </>
+                : 
+                <>
+              <Text style={{ fontSize: 13 }}> Payment Amount </Text>
+                 <Title mt={15} mb={10} order={1}>
                   {formatCurrency(total, currency)}
                 </Title>
                 <Text style={{ fontSize: 13 }}> Select payment method </Text>
+                </>
+                }
+                
 
                 <div
                   style={{
@@ -100,7 +122,7 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
                     justifyContent: "space-around",
                     flexDirection: "row",
                     alignItems: "center",
-                    backgroundColor: "green",
+                    backgroundColor: loading ? "#dedede": "green",
                     marginTop: 40,
                     height: 200,
                     width: "100%",
@@ -114,20 +136,25 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
           cursor: 'pointer',
           borderRight: method.title !== 'QR' ? '2px solid white' : 'none',
           height: '100%',
-          width: '30%',
+          width: '100%',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
         }}
-        onClick={payNow}
       >
+       
         {method.title === 'Card' ? (
-          <div
+          <button
+          onClick={payNow}
+          disabled={loading}
             style={{
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
               textAlign: 'center',
+              backgroundColor: 'transparent',
+              border: 'none',
+              alignItems: 'center'
             }}
           >
             <div>
@@ -140,18 +167,24 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
                 color="#fff"
                 size={60}
               />
+              
             </div>
             <div>
               <Text c={'#FFF'}>Card</Text>
             </div>
-          </div>
+          </button>
         ) : method.title === 'Mobile' ? (
-          <div
+          <button
+          onClick={payNow}
+          disabled={loading}
             style={{
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
               textAlign: 'center',
+              backgroundColor: 'transparent',
+              alignItems: 'center',
+              border: 'none'
             }}
           >
             <div>
@@ -168,14 +201,20 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
             <div>
               <Text c={'#FFF'}>Mobile</Text>
             </div>
-          </div>
+          </button>
         ) : (
-          <div
+          <button
+          onClick={payNow}
+          disabled={loading}
             style={{
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
               textAlign: 'center',
+              backgroundColor: 'transparent',
+              alignItems: 'center',
+              border: 'none'
+
             }}
           >
             <div>
@@ -192,7 +231,7 @@ export function ModalCartItem({ opened, onClose, pay }: ModalCartItemProps) {
             <div>
               <Text c={'#FFF'}>QR</Text>
             </div>
-          </div>
+          </button>
         )}
       </div>
     </>

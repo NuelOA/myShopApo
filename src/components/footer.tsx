@@ -14,19 +14,21 @@ export default function Footer( currency: currencyType ) {
   const {total, cart } = useCart()
   const [opened, { open, close }] = useDisclosure(false)
   const [paynow, setPayNow] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
+
 
   return (
    <div style={{ display: 'flex', justifyContent: 'center'}}>
-          <ModalCartItem opened={opened} onClose={close} pay={paynow ? true : false}/>
+          <ModalCartItem showCart={cartOpen ? true : false} opened={opened} onClose={close} pay={paynow ? true : false}/>
      <div style={footerstyle}>
-        <div onClick={()=> {
+        <Button color='#000' onClick={()=> {
           setPayNow(false)
           open()
-        }} style={{ display:'flex', cursor: 'pointer', justifyContent: 'center', alignItems:'center', width: '50%', height: 50}}><Indicator style={{ marginInline: 15}}  size={15} color='red' inline label={cart.length}> <IconShoppingCart /></Indicator>
+        }} disabled={cart.length <= 0 ? true : false}  style={{ display:'flex', cursor: 'pointer', justifyContent: 'center', alignItems:'center', width: '50%', height: 50}}><Indicator style={{ marginInline: 15}}  size={15} color='red' inline label={cart.length}> <IconShoppingCart /></Indicator>
         <Text mr={20}>{formatCurrency(total, currency.currency)}</Text>
-        </div>
+        </Button>
         <Button color={'#008000'} disabled={cart.length <= 0 ? true : false} onClick={()=> {
-          setPayNow(true)
+          setCartOpen(true)
           open()
         }} style={{ borderRadius: 'none', height: 50, alignItems:'center', display: 'flex', width: '50%', justifyContent: 'center', fontWeight: 'bold'}}> Pay Now</Button>
         </div>
@@ -35,7 +37,7 @@ export default function Footer( currency: currencyType ) {
 }
 
 const footerstyle: React.CSSProperties = {
-    backgroundColor: '#000',
+    // backgroundColor: '#000',
     position: 'fixed',
      bottom: 0, 
      width: '80%',

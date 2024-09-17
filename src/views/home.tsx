@@ -94,7 +94,7 @@ export default function Home() {
               </div>
 
               <div style={itemStyle}>
-                {data.items.map((drink) => (
+                {data.items.map((drink, index) => (
                   <Card
                   className="fade-in"
                     onClick={() => {
