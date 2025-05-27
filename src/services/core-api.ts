@@ -1,7 +1,7 @@
 
 import { cartData, data } from "../data/drinks";
-import { drinksType } from "../types/drinksType";
-import axios from 'axios';
+// import { drinksType } from "../types/drinksType";
+
 
 const getDrinks = (): cartData[] => {
     try {
@@ -17,7 +17,7 @@ const getDrinks = (): cartData[] => {
 
  const makePayment = async (amount: string) => {
   try {
-    const response = await fetch('http://172.60.254.87:8080/v1/pay', {
+    const response = await fetch('http://172.60.254.235:8080/v1/pay', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
