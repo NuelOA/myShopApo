@@ -1,7 +1,7 @@
 import {
   IconArrowLeft,
 } from '@tabler/icons-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../routes/routes';
 import {
@@ -19,8 +19,25 @@ import { useCurrency } from '../context/currencyContext';
 export default function Settings() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<string | null>('Currency');
-const {currencies} = useCurrency();
+  const { currencies } = useCurrency();
+  const [ipAddress, setIpAddress] = useState('');
 
+  // Load saved IP from localStorage on mount
+  useEffect(() => {
+    const savedIp = localStorage.getItem('pinpad_ip');
+    if (savedIp) {
+      setIpAddress(savedIp);
+    }
+  }, []);
+
+  const handleSaveIp = () => {
+    localStorage.setItem('pinpad_ip', ipAddress);
+    alert('IP address saved!');
+  };
+
+  const handleCancel = () => {
+    setIpAddress('');
+  };
 
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -55,36 +72,38 @@ const {currencies} = useCurrency();
 
           {/* Pinpad Tab */}
           <Tabs.Panel value="Pinpad" p={20} mt={40}>
-  <div style={{ display: 'flex', justifyContent: 'center' }}>
-    <Title order={3}>Pinpad Configuration</Title>
-  </div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Title order={3}>Pinpad Configuration</Title>
+            </div>
 
-  {/* Debug Mode Switch */}
-  <div style={{ display: 'flex', justifyContent: 'center', marginTop: 30 }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <Text fw="bold">Debug Mode</Text>
-      <Switch color="#008000" size="lg" />
-    </div>
-  </div>
+            {/* Debug Mode Switch */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 30 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Text fw="bold">Debug Mode</Text>
+                <Switch color="#008000" size="lg" />
+              </div>
+            </div>
 
-  {/* IP Address Input + Buttons */}
-  <div style={{
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: 30,
-    gap: 20,
-    flexWrap: 'wrap',
-    alignItems: 'flex-end'
-  }}>
-    <TextInput
-      label="Pinpad IP Address"
-      placeholder="000.000.0.0.00"
-      style={{ minWidth: 250 }}
-    />
-    <Button color="red" mt="md">Cancel</Button>
-    <Button color="#008000" mt="md">Save</Button>
-  </div>
-</Tabs.Panel>
+            {/* IP Address Input + Buttons */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: 30,
+              gap: 20,
+              flexWrap: 'wrap',
+              alignItems: 'flex-end'
+            }}>
+              <TextInput
+                label="Pinpad IP Address"
+                placeholder="000.000.0.0.00"
+                style={{ minWidth: 250 }}
+                value={ipAddress}
+                onChange={(e) => setIpAddress(e.currentTarget.value)}
+              />
+              <Button color="red" mt="md" onClick={handleCancel}>Cancel</Button>
+              <Button color="#008000" mt="md" onClick={handleSaveIp}>Save</Button>
+            </div>
+          </Tabs.Panel>
 
         </Tabs>
       </div>

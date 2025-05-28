@@ -16,30 +16,32 @@ const getDrinks = (): cartData[] => {
 };
 
 
- const makePayment = async (amount: string, currency: string) => {
+const makePayment = async (amount: string, currency: string) => {
   try {
-    const response = await fetch('http://172.60.254.235:8080/v1/pay', {
+    const ipAddress = localStorage.getItem('pinpad_ip') || '127.0.0.1'; // fallback IP if none saved
+
+    const response = await fetch(`http://${ipAddress}:8080/v1/pay`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-            "MessageType":"0200",
-            "TransactionType":"00",
-            "TellerID": "Teller001",
-            "TellerName": "John Banker",
-            "ReferenceNo":"REF0000001",
-            "DateTime":"20230908221310",
-            "InvoiceNo":"001134440",
-            "TenderType":"00",
-            "Currency":"936",
-            "CurrencySymbol":currency,
-            "TransactionAmount": amount,
-            "CashBackAmount":"0.00",
-            "Narration":"Purchase Transaction",
-            "Account1":"",
-            "Account2":"",
-            "EchoData":"Testing 123"
+        "MessageType": "0200",
+        "TransactionType": "00",
+        "TellerID": "Teller001",
+        "TellerName": "John Banker",
+        "ReferenceNo": "REF0000001",
+        "DateTime": "20230908221310",
+        "InvoiceNo": "001134440",
+        "TenderType": "00",
+        "Currency": "936",
+        "CurrencySymbol": currency,
+        "TransactionAmount": amount,
+        "CashBackAmount": "0.00",
+        "Narration": "Purchase Transaction",
+        "Account1": "",
+        "Account2": "",
+        "EchoData": "Testing 123"
       }),
     });
 
@@ -54,6 +56,7 @@ const getDrinks = (): cartData[] => {
     throw error;
   }
 };
+
 
 
   
