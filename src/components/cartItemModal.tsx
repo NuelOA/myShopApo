@@ -13,6 +13,9 @@ import { formatCurrency } from "../utils/currencyFormatter";
 import { useCurrency } from "../context/currencyContext";
 import { useState } from "react";
 import { makePayment } from "../services/core-api";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../routes/routes";
+
 
 type ModalCartItemProps = {
   opened: boolean;
@@ -28,13 +31,12 @@ const paymentMethods = [
 ];
 
 export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemProps) {
-  // Destructure props
   const { cart, removeFromCart, clearCart, total } = useCart();
   const { currency } = useCurrency();
   const [payScreen, setPayScreen] = useState(pay);
   const [cartScreen, setCartScreen] = useState(showCart);
   const [loading, setLoading] = useState(false)
- 
+  const navigate = useNavigate()
   console.log(cartScreen)
 
   const rows = cart.map((item) => (
@@ -57,10 +59,12 @@ export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemP
   const payNow = async () => {
     setLoading(true)
     try {
-      const data = await makePayment(total.toFixed(2));
+      const data = await makePayment(total.toFixed(2), currency);
       if(data.ResponseText === 'Approved'){
         setLoading(false)
-        alert('payment successful')
+        navigate(ROUTES.success)
+        // alert('payment successful')
+        onClose()
       }
     } catch (err) {
       alert(err)

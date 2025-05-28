@@ -1,7 +1,9 @@
 
+import { useCurrency } from "../context/currencyContext";
 import { cartData, data } from "../data/drinks";
 import { drinksType } from "../types/drinksType";
-import axios from 'axios';
+// import axios from 'axios';
+
 
 const getDrinks = (): cartData[] => {
     try {
@@ -15,9 +17,9 @@ const getDrinks = (): cartData[] => {
 };
 
 
- const makePayment = async (amount: string) => {
+ const makePayment = async (amount: string, currency: string) => {
   try {
-    const response = await fetch('http://172.60.254.87:8080/v1/pay', {
+    const response = await fetch('http://172.60.254.235:8080/v1/pay', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +34,7 @@ const getDrinks = (): cartData[] => {
             "InvoiceNo":"001134440",
             "TenderType":"00",
             "Currency":"936",
-            "CurrencySymbol":"GHS",
+            "CurrencySymbol":currency,
             "TransactionAmount": amount,
             "CashBackAmount":"0.00",
             "Narration":"Purchase Transaction",

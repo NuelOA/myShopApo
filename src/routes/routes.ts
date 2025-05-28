@@ -1,4 +1,6 @@
 export const ROUTES = {
     home: '/',
-    settings: '/settings'
+    settings: '/settings',
+    success: '/success'
+
 }
