@@ -1,27 +1,25 @@
 import { useDisclosure } from "@mantine/hooks";
-import { Alert, Button, Modal, Text, Title, Table, Divider, Loader } from "@mantine/core";
-import { CartItem } from "../types/cartType";
-import { useCart } from "../context/cartContext";
 import {
-  IconCreditCard,
-  IconPhoneCheck,
-  IconQrcode,
-  IconShoppingCartOff,
-  IconTrash,
-} from "@tabler/icons-react";
-import { formatCurrency } from "../utils/currencyFormatter";
-import { useCurrency } from "../context/currencyContext";
+  Alert,
+  Button,
+  Modal,
+  Text,
+  Title,
+  Table,
+  Loader,
+} from "@mantine/core";
+import { IconCreditCard, IconPhoneCheck, IconQrcode, IconShoppingCartOff, IconTrash, IconCheck } from "@tabler/icons-react";
 import { useState } from "react";
+import { useCart } from "../context/cartContext";
+import { useCurrency } from "../context/currencyContext";
+import { formatCurrency } from "../utils/currencyFormatter";
 import { makePayment } from "../services/core-api";
-import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../routes/routes";
-
 
 type ModalCartItemProps = {
   opened: boolean;
   onClose: () => void;
   pay: boolean;
-  showCart: boolean
+  showCart: boolean;
 };
 
 const paymentMethods = [
@@ -35,9 +33,8 @@ export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemP
   const { currency } = useCurrency();
   const [payScreen, setPayScreen] = useState(pay);
   const [cartScreen, setCartScreen] = useState(showCart);
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
-  console.log(cartScreen)
+  const [loading, setLoading] = useState(false);
+  const [successModal, setSuccessModal] = useState(false);
 
   const rows = cart.map((item) => (
     <Table.Tr key={item.id}>
@@ -45,44 +42,35 @@ export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemP
       <Table.Td>{item.quantity}</Table.Td>
       <Table.Td>{formatCurrency(item.price, currency)}</Table.Td>
       <Table.Td>
-        {
-          <IconTrash
-            style={{ cursor: "pointer" }}
-            color="red"
-            onClick={() => removeFromCart(item.id)}
-          />
-        }
+        <IconTrash
+          style={{ cursor: "pointer" }}
+          color="red"
+          onClick={() => removeFromCart(item.id)}
+        />
       </Table.Td>
     </Table.Tr>
   ));
 
   const payNow = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const data = await makePayment(total.toFixed(2), currency);
-      if(data.ResponseText === 'Approved'){
-        setLoading(false)
-        navigate(ROUTES.success)
-        // alert('payment successful')
-        onClose()
+      if (data.ResponseText === "Approved") {
+        setLoading(false);
+        setSuccessModal(true);
+        clearCart();
+        setPayScreen(false);
       }
     } catch (err) {
-      alert(err)
-      setLoading(false)
+      alert(err);
+      setLoading(false);
       console.log(err);
     }
   };
 
   return (
     <>
-      <Modal
-        size={"60%"}
-        opened={opened}
-        onClose={onClose}
-        // title={<Title order={3}>Item Details</Title>}
-        centered
-      >
-        
+      <Modal size="60%" opened={opened} onClose={onClose} centered>
         <div
           style={{
             paddingInline: "3%",
@@ -93,228 +81,97 @@ export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemP
             marginTop: 30,
           }}
         >
-          {
-            payScreen ? (
+          {payScreen ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {loading ? (
+                <>
+                  <Text style={{ fontSize: 13 }}>Amount {formatCurrency(total, currency)}</Text>
+                  <Loader mt={20} color="#000" />
+                  <Text mt={20} style={{ fontSize: 13 }}>Processing Transaction</Text>
+                </>
+              ) : (
+                <>
+                  <Text style={{ fontSize: 13 }}>Payment Amount</Text>
+                  <Title mt={15} mb={10} order={1}>
+                    {formatCurrency(total, currency)}
+                  </Title>
+                  <Text style={{ fontSize: 13 }}>Select payment method</Text>
+                </>
+              )}
+
               <div
                 style={{
                   display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
+                  justifyContent: "space-around",
+                  flexDirection: "row",
                   alignItems: "center",
+                  backgroundColor: loading ? "#dedede" : "green",
+                  marginTop: 40,
+                  height: 200,
+                  width: "100%",
                 }}
               >
-           
-                {loading ? <>
-                  <Text style={{ fontSize: 13 }}> Amount {formatCurrency(total, currency)} </Text>
-                  <Loader mt={20} color="#000" />
-                  <Text mt={20} style={{ fontSize: 13 }}> Processing Transaction </Text>
-                </>
-                : 
-                <>
-              <Text style={{ fontSize: 13 }}> Payment Amount </Text>
-                 <Title mt={15} mb={10} order={1}>
-                  {formatCurrency(total, currency)}
-                </Title>
-                <Text style={{ fontSize: 13 }}> Select payment method </Text>
-                </>
-                }
-                
-
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-around",
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: loading ? "#dedede": "green",
-                    marginTop: 40,
-                    height: 200,
-                    width: "100%",
-                  }}
-                >
-                 {paymentMethods.map((method) => {
-  return (
-    <>
-      <div
-        style={{
-          cursor: 'pointer',
-          borderRight: method.title !== 'QR' ? '2px solid white' : 'none',
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-       
-        {method.title === 'Card' ? (
-          <button
-          onClick={payNow}
-          disabled={loading}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              textAlign: 'center',
-              backgroundColor: 'transparent',
-              border: 'none',
-              alignItems: 'center'
-            }}
-          >
-            <div>
-              <IconCreditCard
-                style={{
-                  backgroundColor: '#7cb07d52',
-                  padding: 10,
-                  borderRadius: 100,
-                }}
-                color="#fff"
-                size={60}
-              />
-              
-            </div>
-            <div>
-              <Text c={'#FFF'}>Card</Text>
-            </div>
-          </button>
-        ) : method.title === 'Mobile' ? (
-          <button
-          onClick={payNow}
-          disabled={loading}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              textAlign: 'center',
-              backgroundColor: 'transparent',
-              alignItems: 'center',
-              border: 'none'
-            }}
-          >
-            <div>
-              <IconPhoneCheck
-                style={{
-                  backgroundColor: '#7cb07d52',
-                  padding: 10,
-                  borderRadius: 100,
-                }}
-                color="#fff"
-                size={60}
-              />
-            </div>
-            <div>
-              <Text c={'#FFF'}>Mobile</Text>
-            </div>
-          </button>
-        ) : (
-          <button
-          onClick={payNow}
-          disabled={loading}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              textAlign: 'center',
-              backgroundColor: 'transparent',
-              alignItems: 'center',
-              border: 'none'
-
-            }}
-          >
-            <div>
-              <IconQrcode
-                style={{
-                  backgroundColor: '#7cb07d52',
-                  padding: 10,
-                  borderRadius: 100,
-                }}
-                color="#fff"
-                size={60}
-              />
-            </div>
-            <div>
-              <Text c={'#FFF'}>QR</Text>
-            </div>
-          </button>
-        )}
-      </div>
-    </>
-  );
-})}
-
-
-                </div>
+                {paymentMethods.map((method) => (
+                  <div
+                    key={method.title}
+                    style={{
+                      cursor: "pointer",
+                      borderRight: method.title !== "QR" ? "2px solid white" : "none",
+                      height: "100%",
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <button
+                      onClick={payNow}
+                      disabled={loading}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        backgroundColor: "transparent",
+                        border: "none",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div>
+                        {method.title === "Card" && <IconCreditCard style={{ backgroundColor: "#7cb07d52", padding: 10, borderRadius: 100 }} color="#fff" size={60} />}
+                        {method.title === "Mobile" && <IconPhoneCheck style={{ backgroundColor: "#7cb07d52", padding: 10, borderRadius: 100 }} color="#fff" size={60} />}
+                        {method.title === "QR" && <IconQrcode style={{ backgroundColor: "#7cb07d52", padding: 10, borderRadius: 100 }} color="#fff" size={60} />}
+                      </div>
+                      <div>
+                        <Text c={"#FFF"}>{method.title}</Text>
+                      </div>
+                    </button>
+                  </div>
+                ))}
               </div>
-            ) : (
-              <Table>
-                <Table.Thead>
-                  <Table.Tr>
-                    <Table.Th>Product</Table.Th>
-                    <Table.Th>Quantity</Table.Th>
-                    <Table.Th>Price</Table.Th>
-                    <Table.Th>Action</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>{rows}</Table.Tbody>
-              </Table>
-            )
-
-            // :  <div>
-            //   {cart.map((item) => (
-            //     <>
-            //       <div
-            //         key={item.id}
-            //         style={{
-            //           display: "flex",
-            //           flexDirection: "row",
-            //           justifyContent: "space-between",
-            //           width: "100%",
-            //           borderBottom: '1px solid #dedede',
-            //           padding: 10,
-            //           // backgroundColor: '#ececec',
-            //           marginRight: 10,
-            //           marginBlock: 5
-            //         }}
-            //       >
-            //        <div>
-            //        {/* <div>
-            //           <img src={item.image} width={70} alt="image"/>
-            //           </div> */}
-            //           <Text fw={'bold'}>
-            //           {item.name}
-            //         </Text>
-            //        </div>
-
-            //        <Text>QTY: {item.quantity}</Text>
-
-            //         <div style={{ display:'flex'}}>
-            //          <div>
-            //         <Text>Price: {formatCurrency(item.price, currency)}</Text>
-            //          </div>
-            //         </div>
-            //        <div>
-            //        <IconTrash style={{ cursor: 'pointer'}} color="red" onClick={() => removeFromCart(item.id)} />
-            //        </div>
-            //       </div>
-            //     </>
-            //   ))}
-            //   </div>
-          }
+            </div>
+          ) : (
+            <Table>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Product</Table.Th>
+                  <Table.Th>Quantity</Table.Th>
+                  <Table.Th>Price</Table.Th>
+                  <Table.Th>Action</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          )}
 
           <div style={{ marginBottom: 20 }}>
-            {/* <Alert color="green" mt={20}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Text fw={"bold"}>Total</Text>
-                <Text>{formatCurrency(total, currency)}</Text>
-              </div>
-            </Alert> */}
-
             <div
               style={{
                 display: "flex",
@@ -346,11 +203,34 @@ export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemP
                 color={payScreen ? "red" : "#008000"}
                 w={"50%"}
               >
-                {" "}
                 {payScreen ? "Cancel" : "Complete payment"}
               </Button>
             </div>
           </div>
+        </div>
+      </Modal>
+
+      {/* Success Modal */}
+      <Modal
+        opened={successModal}
+        onClose={() => {
+          setSuccessModal(false);
+          onClose();
+        }}
+        size="sm"
+        centered
+        withCloseButton={false}
+      >
+        <div style={{ textAlign: "center", padding: 20 }}>
+          <IconCheck size={60} color="green" style={{ marginBottom: 20 }} />
+          <Title order={3}>Payment Successful</Title>
+          <Text mt={10}>Thank you for your purchase!</Text>
+          <Button color="#000" fullWidth mt={30} onClick={() => {
+            setSuccessModal(false);
+            onClose();
+          }}>
+            Close
+          </Button>
         </div>
       </Modal>
     </>
