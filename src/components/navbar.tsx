@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../routes/routes";
 
 export default function Navbar() {
-  const { currency, updateCurrency } = useCurrency();
+  const { currency, currencies, updateCurrency } = useCurrency();
   const navigate = useNavigate()
 
   // const handleCurrencyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -39,7 +39,7 @@ export default function Navbar() {
             onChange={(e: any) => updateCurrency(e)}
             w={100}
             mr={20}
-            data={["USD", "GHS", "ZiG"]}
+            data={currencies.map((currency) => (currency.value))}
           />
           {/* <Divider orientation="vertical" /> */}
           {/* <IconPower color="red" style={{ marginLeft: 10 }} /> */}
