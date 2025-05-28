@@ -2,7 +2,7 @@
   "name": "my-shop",
   "version": "0.1.0",
   "private": true,
-  "homepage": "MyShopApp",
+  "homepage": "http://myshopdemo.s3-website-us-east-1.amazonaws.com/",
   "dependencies": {
     "@mantine/core": "^7.12.1",
     "@mantine/hooks": "^7.12.1",
@@ -14,7 +14,7 @@
     "@types/node": "^16.18.105",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
-    "axios": "^1.7.7",
+    "axios": "^1.9.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.1",
@@ -51,5 +51,4 @@
     "postcss-preset-mantine": "^1.17.0",
     "postcss-simple-vars": "^7.0.1"
   }
-  
 }

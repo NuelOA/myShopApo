@@ -1,8 +1,7 @@
 
 import { useCurrency } from "../context/currencyContext";
 import { cartData, data } from "../data/drinks";
-import { drinksType } from "../types/drinksType";
-// import axios from 'axios';
+// import { drinksType } from "../types/drinksType";
 
 
 const getDrinks = (): cartData[] => {

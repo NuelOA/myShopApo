@@ -2,8 +2,7 @@ import { IconArrowBack, IconArrowBarToLeft, IconArrowLeft } from '@tabler/icons-
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../routes/routes'
-import { Paper, Tabs, Text, Title } from '@mantine/core'
-import CommodityManagement from './commodityManage'
+import { Button, Paper, Switch, Tabs, Text, TextInput, Title } from '@mantine/core'
 
 export default function Settings() {
   const navigate = useNavigate()
@@ -54,8 +53,24 @@ const [tab, setTab] = useState<string | null>('Currency')
         <Tabs.Tab fw={'bold'}  value="Pinpad">Pinpad Settings</Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel value="Currency" mt={40} p={20}>First panel</Tabs.Panel>
-      <Tabs.Panel value="Pinpad" p={20} mt={40}>Second panel</Tabs.Panel>
+      <Tabs.Panel value="Currency" mt={40} p={20}>
+        <div style={{ display: 'flex', justifyContent: 'center'}}>
+          <Title order={3}>Currency Configuration</Title>
+        </div>
+        </Tabs.Panel>
+      <Tabs.Panel value="Pinpad" p={20} mt={40}>
+      <div style={{ display: 'flex', justifyContent: 'center'}}>
+          <Title order={3}>Pinpad Configuration</Title>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 30, alignItems: 'center'}}>
+          <Text mr={20} fw={'bold'}>Debug Mode</Text><Switch color='#008000' size='lg' />
+          </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 30, alignItems: 'center'}}>
+        <TextInput label='Input pinpad IP address' placeholder='000.000.0.0.00' m={20}/> <Button m={20} color='red'>Cancel</Button>   <Button color="#008000" m={20}>Save</Button>
+          </div>
+        
+       
+        </Tabs.Panel>
     </Tabs>
        
         </div>
