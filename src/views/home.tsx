@@ -11,7 +11,7 @@ import { formatCurrency } from "../utils/currencyFormatter";
 
 export default function Home() {
   const [drinksData, setDrinksData] = useState<cartData[]>([]);
-  const { currency } = useCurrency();
+  const { currency, convertPrice } = useCurrency();
   const { addToCart, updateCart, removeFromCart, cart } = useCart();
   const [highlightedCard, setHighlightedCard] = useState<string | null>(null);
 
@@ -136,7 +136,7 @@ export default function Home() {
                    <Text fw={'bold'}>{drink.drink}</Text>
   
                       <Text c="red" mt={5} fw={'bold'} variant="filled">
-                       {formatCurrency(parseFloat(drink.price), currency)}
+                       {formatCurrency(convertPrice(parseFloat(drink.price)), currency)}
                       </Text>
                    </div>
 

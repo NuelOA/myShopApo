@@ -13,14 +13,47 @@ import {
   Text,
   TextInput,
   Title,
+  NumberInput,
+  Group,
+  Stack,
 } from '@mantine/core';
 import { useCurrency } from '../context/currencyContext';
 
 export default function Settings() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<string | null>('Currency');
-  const { currencies } = useCurrency();
+  const { currencies, currency, updateCurrency, exchangeRates, updateExchangeRate } = useCurrency();
   const [ipAddress, setIpAddress] = useState('');
+  const [tempRates, setTempRates] = useState(exchangeRates);
+  const [loading, setLoading] = useState(false);
+
+  const fetchCurrentRates = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+      const data = await response.json();
+      const newRates = {
+        USD: 1.00,
+        EUR: data.rates.EUR || 0.85,
+        GBP: data.rates.GBP || 0.73,
+        GHS: data.rates.GHS || 12.50,
+        NGN: data.rates.NGN || 460.00,
+        KES: data.rates.KES || 130.00,
+        ZAR: data.rates.ZAR || 18.50,
+        UGX: data.rates.UGX || 3700.00,
+        ZMK: data.rates.ZMK || 25.00
+      };
+      setTempRates(newRates);
+      Object.entries(newRates).forEach(([curr, rate]) => {
+        updateExchangeRate(curr, rate);
+      });
+      alert('Exchange rates updated with current market rates!');
+    } catch (error) {
+      alert('Failed to fetch current exchange rates');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load saved IP from localStorage on mount
   useEffect(() => {
@@ -29,6 +62,11 @@ export default function Settings() {
       setIpAddress(savedIp);
     }
   }, []);
+
+  // Update temp rates when exchange rates change
+  useEffect(() => {
+    setTempRates(exchangeRates);
+  }, [exchangeRates]);
 
   const handleSaveIp = () => {
     localStorage.setItem('pinpad_ip', ipAddress);
@@ -60,13 +98,54 @@ export default function Settings() {
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <Title order={3}>Currency Configuration</Title>
             </div>
-            <div style={{ maxWidth: 400, margin: '40px auto' }}>
-              <Select
-                label="Select currency"
-                placeholder="Pick a currency"
-                data={currencies}
-                searchable
-              />
+            <div style={{ maxWidth: 600, margin: '40px auto' }}>
+              <Stack gap="md">
+                <Select
+                  label="Select currency"
+                  placeholder="Pick a currency"
+                  data={currencies}
+                  value={currency}
+                  onChange={(value) => value && updateCurrency(value)}
+                  searchable
+                />
+                
+                <Title order={4} mt="xl">Exchange Rates (relative to USD)</Title>
+                <Text size="sm" c="dimmed">Update exchange rates for currency conversion</Text>
+                
+                {currencies.map((curr) => (
+                  <Group key={curr.value} justify="space-between">
+                    <Text fw={500}>{curr.label}</Text>
+                    <NumberInput
+                      value={tempRates[curr.value]}
+                      onChange={(value) => setTempRates(prev => ({ ...prev, [curr.value]: Number(value) || 0 }))}
+                      decimalScale={4}
+                      fixedDecimalScale
+                      w={120}
+                    />
+                  </Group>
+                ))}
+                
+                <Group justify="center" mt="md" gap="md">
+                  <Button 
+                    onClick={fetchCurrentRates}
+                    loading={loading}
+                    variant="outline"
+                  >
+                    Get Current Rates
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      Object.entries(tempRates).forEach(([curr, rate]) => {
+                        updateExchangeRate(curr, rate);
+                      });
+                      alert('Exchange rates updated!');
+                    }}
+                    color="green"
+                  >
+                    Save Exchange Rates
+                  </Button>
+                </Group>
+              </Stack>
             </div>
           </Tabs.Panel>
 

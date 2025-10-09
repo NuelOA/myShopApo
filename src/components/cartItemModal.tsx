@@ -30,7 +30,7 @@ const paymentMethods = [
 
 export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemProps) {
   const { cart, removeFromCart, clearCart, total } = useCart();
-  const { currency } = useCurrency();
+  const { currency, convertPrice } = useCurrency();
   const [payScreen, setPayScreen] = useState(pay);
   const [cartScreen, setCartScreen] = useState(showCart);
   const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemP
     <Table.Tr key={item.id}>
       <Table.Td>{item.name}</Table.Td>
       <Table.Td>{item.quantity}</Table.Td>
-      <Table.Td>{formatCurrency(item.price, currency)}</Table.Td>
+      <Table.Td>{formatCurrency(convertPrice(item.price), currency)}</Table.Td>
       <Table.Td>
         <IconTrash
           style={{ cursor: "pointer" }}
@@ -92,7 +92,7 @@ export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemP
             >
               {loading ? (
                 <>
-                  <Text style={{ fontSize: 13 }}>Amount {formatCurrency(total, currency)}</Text>
+                  <Text style={{ fontSize: 13 }}>Amount {formatCurrency(convertPrice(total), currency)}</Text>
                   <Loader mt={20} color="#000" />
                   <Text mt={20} style={{ fontSize: 13 }}>Processing Transaction</Text>
                 </>
@@ -100,7 +100,7 @@ export function ModalCartItem({ opened, onClose, pay, showCart }: ModalCartItemP
                 <>
                   <Text style={{ fontSize: 13 }}>Payment Amount</Text>
                   <Title mt={15} mb={10} order={1}>
-                    {formatCurrency(total, currency)}
+                    {formatCurrency(convertPrice(total), currency)}
                   </Title>
                   <Text style={{ fontSize: 13 }}>Select payment method</Text>
                 </>
