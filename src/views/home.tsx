@@ -76,10 +76,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <div
-          style={{ overflow: "auto", width: "80%", backgroundColor: "#fff" }}
-        >
+      <div className="app-container" style={{ backgroundColor: "#fff", minHeight: "100vh" }}>
           {drinksData.map((data, index) => (
             <>
               <div
@@ -202,7 +199,6 @@ export default function Home() {
               </div>
             </>
           ))}
-        </div>
       </div>
       <Footer currency={`${currency}`} />
     </>

@@ -75,11 +75,12 @@ export default function Footer( currency: currencyType ) {
        setPayScreen(false);
      }} position="bottom" size="70%" title={payScreen ? "Payment" : "Cart Items"} styles={{
        content: {
-         maxWidth: '1430px',
+         width: '100%',
+         maxWidth: '1200px',
          margin: '0 auto',
          left: '50%',
          transform: 'translateX(-50%)',
-            borderTopLeftRadius: '16px',
+         borderTopLeftRadius: '16px',
          borderTopRightRadius: '16px'
        }
      }}>
@@ -181,13 +182,15 @@ export default function Footer( currency: currencyType ) {
 }
 
 const footerstyle: React.CSSProperties = {
-    // backgroundColor: '#000',
     position: 'fixed',
-     bottom: 0, 
-     width: '80%',
+    bottom: 0, 
+    width: '100%',
+    maxWidth: '1200px',
     alignItems:'center', 
-     color: '#fff',
-     display: 'flex', 
-     flexDirection:'row',
-     justifyContent: 'space-between'
+    color: '#fff',
+    display: 'flex', 
+    flexDirection:'row',
+    justifyContent: 'space-between',
+    padding: '0 20px',
+    boxSizing: 'border-box'
 }
