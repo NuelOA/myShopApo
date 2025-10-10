@@ -6,6 +6,7 @@ import { useCurrency } from '../context/currencyContext'
 import { formatCurrency } from '../utils/currencyFormatter'
 import { useDisclosure } from '@mantine/hooks';
 import { makePayment } from '../services/core-api';
+import { ReceiptModal } from './receiptModal';
 
 interface currencyType {
     currency: string
@@ -21,23 +22,26 @@ export default function Footer( currency: currencyType ) {
   const {total, cart, removeFromCart, clearCart } = useCart()
   const { convertPrice } = useCurrency()
   const [opened, { open, close }] = useDisclosure(false)
+  const [receiptOpened, { open: openReceipt, close: closeReceipt }] = useDisclosure(false)
   const [payScreen, setPayScreen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [successModal, setSuccessModal] = useState(false)
+  const [transactionData, setTransactionData] = useState(null)
 
 
   const payNow = async () => {
     setLoading(true);
     try {
       const data = await makePayment(convertPrice(total).toFixed(2), currency.currency);
-      if (data.ResponseText === "Approved") {
-        setLoading(false);
-        setSuccessModal(true);
+      if (data.ResponseText === "Approved" || data.ResponseCode === "00") {
         clearCart();
+        close();
         setPayScreen(false);
+        setTransactionData(data);
+        openReceipt();
       }
     } catch (err) {
       alert(err);
+    } finally {
       setLoading(false);
     }
   };
@@ -177,6 +181,11 @@ export default function Footer( currency: currencyType ) {
          </Group>
        </div>
      </Drawer>
+     <ReceiptModal 
+       opened={receiptOpened} 
+       onClose={closeReceipt} 
+       transactionData={transactionData} 
+     />
    </>
   )
 }

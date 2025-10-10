@@ -1,6 +1,6 @@
 export const ROUTES = {
     home: '/',
     settings: '/settings',
-    success: '/success'
-
+    success: '/success',
+    receipt: '/receipt'
 }

@@ -18,41 +18,30 @@ const getDrinks = (): cartData[] => {
 
 const makePayment = async (amount: string, currency: string) => {
   try {
-    const ipAddress = localStorage.getItem('pinpad_ip') || '127.0.0.1'; // fallback IP if none saved
-
-    const response = await fetch(`http://${ipAddress}:8080/v1/pay`, {
+    const pinpadIP = localStorage.getItem('pinpad_ip') || '192.168.1.195';
+    
+    console.log('Making payment via proxy server');
+    
+    const response = await fetch('http://localhost:3001/api/pay', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "MessageType": "0200",
-        "TransactionType": "00",
-        "TellerID": "Teller001",
-        "TellerName": "John Banker",
-        "ReferenceNo": "REF0000001",
-        "DateTime": "20230908221310",
-        "InvoiceNo": "001134440",
-        "TenderType": "00",
-        "Currency": "936",
-        "CurrencySymbol": currency,
-        "TransactionAmount": amount,
-        "CashBackAmount": "0.00",
-        "Narration": "Purchase Transaction",
-        "Account1": "",
-        "Account2": "",
-        "EchoData": "Testing 123"
+        amount: amount,
+        currency: currency,
+        pinpadIP: pinpadIP
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      throw new Error(`Proxy server error: ${response.status}`);
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error making pay request:', error);
+    console.error('Payment error:', error);
     throw error;
   }
 };
